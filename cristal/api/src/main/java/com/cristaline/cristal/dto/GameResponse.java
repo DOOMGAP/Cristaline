@@ -1,4 +1,11 @@
 package com.cristaline.cristal.dto;
 
-public class GameResponse {
+public record GameResponse(
+    Long id,
+    String title,
+    String genre,
+    Integer releaseYear,
+    String description,
+    String coverUrl
+) {
 }

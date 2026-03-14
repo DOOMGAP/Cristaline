@@ -1,4 +1,4 @@
 package com.cristaline.cristal.dto;
 
-public class AuthResponse {
+public record AuthResponse(String token) {
 }

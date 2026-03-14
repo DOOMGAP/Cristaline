@@ -1,0 +1,5 @@
+front/node_modules/
+front/.angular/
+front/dist/
+front/.cache/
+api/target/
