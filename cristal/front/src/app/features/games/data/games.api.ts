@@ -6,7 +6,7 @@ import { Game, GamePayload } from './game.model';
 @Injectable({ providedIn: 'root' })
 export class GamesApi {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080';
+  private readonly baseUrl = this.resolveBaseUrl();
 
   list(filters: { title?: string; genre?: string; year?: string }): Observable<Game[]> {
     let params = new HttpParams();
@@ -38,5 +38,13 @@ export class GamesApi {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/admin/games/${id}`);
+  }
+
+  private resolveBaseUrl(): string {
+    if (typeof window === 'undefined') {
+      return 'http://localhost:8080';
+    }
+
+    return `${window.location.protocol}//${window.location.hostname}:8080`;
   }
 }
