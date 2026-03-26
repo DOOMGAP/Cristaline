@@ -42,6 +42,7 @@ public class User {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.password = password;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -55,15 +56,15 @@ public class User {
         favoriteGamesIds.remove(gameId);
         this.updatedAt = Instant.now();
     }
-    public void rateGame(Long gameId, int rating, String comment) {
+    public void rateGame(Long gameId, Double rating) {
         Optional<Rating> existing = ratedGames.stream()
                 .filter(r -> r.getGameId().equals(gameId))
                 .findFirst();
 
         if (existing.isPresent()) {
-            existing.get().updateRating(rating, comment);
+            existing.get().updateRating(rating);
         } else {
-            Rating newRating = new Rating(this, gameId, rating, comment);
+            Rating newRating = new Rating(this, gameId, rating);
             ratedGames.add(newRating);
         }
 
