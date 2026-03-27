@@ -58,13 +58,13 @@ services:
     networks:
       - back
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=consumer
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d consumer || exit 1"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,8 +73,8 @@ services:
   pgadmin4:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
-      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
@@ -88,13 +88,13 @@ services:
     build:
       context: ./api
     ports:
-      - "8080:8080"
+      - "${API_PORT}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://consumer-postgresql:5432/consumer
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      KAFKA_BOOTSTRAP_SERVERS: kafka-0:9092
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
     depends_on:
       kafka-0:
         condition: service_healthy
@@ -107,7 +107,7 @@ services:
     build:
       context: ./front
     ports:
-      - "4200:80"
+      - "${FRONT_PORT}:80"
     depends_on:
       - api
     networks:

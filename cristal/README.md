@@ -15,10 +15,12 @@ Le profil `dev` est le profil par défaut.
 
 ```bash
 cd /home/nadir95400/fullstack/cristal
+cp .env.example .env
 docker-compose up --build
 ```
 
 Dans Docker, l'API démarre automatiquement avec le profil `prod`.
+Les variables sensibles et les ports sont lus depuis `.env`.
 
 ## Ce que ça change
 
