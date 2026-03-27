@@ -15,10 +15,19 @@ Le profil `dev` est le profil par défaut.
 
 ```bash
 cd /home/nadir95400/fullstack/cristal
-docker-compose up --build
+docker compose up --build
 ```
 
 Dans Docker, l'API démarre automatiquement avec le profil `prod`.
+Les variables sensibles et les ports sont lus depuis `.env`.
+
+### Arrêt et redémarrage propre
+
+```bash
+cd /home/nadir95400/fullstack/cristal
+docker compose down -v --remove-orphans
+docker compose up --build
+```
 
 ## Ce que ça change
 
@@ -44,3 +53,25 @@ Dans Docker, l'API démarre automatiquement avec le profil `prod`.
 - PostgreSQL : `localhost:5432`
 - pgAdmin : `http://localhost:81`
 - Kafka Console : `http://localhost:8081`
+
+## Notes d'exécution
+
+### Logs Kafka au démarrage
+
+Des messages comme `CoordinatorLoadInProgressException`, `Request joining group due to: rebalance failed` ou `(Re-)joining group` peuvent apparaître juste après le démarrage de Kafka et de l'API.
+
+Ce comportement est normal tant que le consumer finit par rejoindre le groupe, par exemple avec des lignes comme :
+
+- `Successfully joined group`
+- `Successfully synced group`
+- `partitions assigned`
+
+### Front Angular en 404 sur `/games`
+
+Si l'application front marche sur `/` mais renvoie un 404 Nginx sur une route comme `/games`, `/favorites` ou `/admin/games`, le problème vient du fallback SPA côté Nginx.
+
+Le conteneur front doit rediriger les routes applicatives vers `index.html`. Après modification de la configuration Nginx, reconstruire l'image :
+
+```bash
+docker compose up --build front
+```
