@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private final GameRepository gameRepository;
+    private final EventPublisherService eventPublisherService;
 
-    public GameService(GameRepository gameRepository) {
+    public GameService(GameRepository gameRepository, EventPublisherService eventPublisherService) {
         this.gameRepository = gameRepository;
+        this.eventPublisherService = eventPublisherService;
     }
 
     public List<GameResponse> listGames(String title, String genre, Integer year) {
@@ -55,17 +57,24 @@ public class GameService {
     public GameResponse createGame(GameRequest request) {
         Game game = new Game();
         applyRequest(game, request);
-        return toResponse(gameRepository.save(game));
+        GameResponse response = toResponse(gameRepository.save(game));
+        eventPublisherService.publishGameCreated(response);
+        return response;
     }
 
     public GameResponse updateGame(Long id, GameRequest request) {
         Game game = findGame(id);
         applyRequest(game, request);
-        return toResponse(gameRepository.save(game));
+        GameResponse response = toResponse(gameRepository.save(game));
+        eventPublisherService.publishGameUpdated(response);
+        return response;
     }
 
     public void deleteGame(Long id) {
-        gameRepository.delete(findGame(id));
+        Game game = findGame(id);
+        GameResponse response = toResponse(game);
+        gameRepository.delete(game);
+        eventPublisherService.publishGameDeleted(response);
     }
 
     private Game findGame(Long id) {

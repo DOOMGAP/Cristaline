@@ -3,3 +3,4 @@ front/.angular/
 front/dist/
 front/.cache/
 api/target/
+.env

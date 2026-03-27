@@ -19,6 +19,7 @@ class GameRepositoryTest {
     void shouldPersistAndReadGame() {
         Game savedGame = gameRepository.save(new Game(
             null,
+            null,
             "Outer Wilds",
             "Adventure",
             2019,
@@ -29,7 +30,7 @@ class GameRepositoryTest {
         List<Game> games = gameRepository.findAll();
 
         assertThat(games)
-            .extracting(Game::getId, Game::getTitle, Game::getGenre, Game::getReleaseYear)
-            .contains(tuple(savedGame.getId(), "Outer Wilds", "Adventure", 2019));
+            .extracting(Game::getId, Game::getApiId, Game::getTitle, Game::getGenre, Game::getReleaseYear)
+            .contains(tuple(savedGame.getId(), null, "Outer Wilds", "Adventure", 2019));
     }
 }
