@@ -11,6 +11,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
         <a class="brand" routerLink="/games">Cristal</a>
         <nav>
           <a routerLink="/games" routerLinkActive="active">Catalogue</a>
+          <a routerLink="/favorites" routerLinkActive="active">Favoris</a>
           <a routerLink="/admin/games" routerLinkActive="active">Admin</a>
         </nav>
       </header>
