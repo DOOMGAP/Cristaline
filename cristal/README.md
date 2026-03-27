@@ -33,6 +33,9 @@ Dans Docker, l'API démarre automatiquement avec le profil `prod`.
 - utilise PostgreSQL au lieu de H2
 - utilise Kafka
 - démarre toute la stack avec Docker
+- synchronise les jeux FreeToGame à chaque démarrage de l'API via `api_id`
+- met à jour les jeux importés existants et supprime ceux qui ne sont plus présents dans FreeToGame
+- conserve les jeux ajoutés manuellement avec `api_id = null`
 
 ## URLs utiles en prod Docker
 

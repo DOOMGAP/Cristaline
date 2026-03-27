@@ -5,7 +5,10 @@ import com.cristaline.cristal.model.Game;
 import com.cristaline.cristal.repository.GameRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,28 +25,52 @@ public class ImportService {
 
     @Transactional
     public int refreshFromFreeToGame() {
-        List<Game> importedGames = freeToGameClient.fetchGames().stream()
-            .map(this::toGame)
+        List<FreeToGameApiResponse> apiGames = freeToGameClient.fetchGames();
+        List<Game> importedGames = apiGames.stream()
+            .map(this::upsertGame)
             .toList();
 
         if (importedGames.isEmpty()) {
             return 0;
         }
 
-        gameRepository.deleteAllInBatch();
+        deleteRemovedApiGames(apiGames);
         gameRepository.saveAll(importedGames);
         return importedGames.size();
     }
 
-    private Game toGame(FreeToGameApiResponse game) {
-        return new Game(
-            null,
-            truncate(game.title(), 120),
-            truncate(defaultValue(game.genre(), "Unknown"), 80),
-            extractYear(game.releaseDate()),
-            truncate(defaultValue(game.shortDescription(), "Imported from FreeToGame."), 2000),
-            truncate(game.thumbnail(), 500)
-        );
+    private void deleteRemovedApiGames(List<FreeToGameApiResponse> apiGames) {
+        Set<Long> currentApiIds = apiGames.stream()
+            .map(FreeToGameApiResponse::id)
+            .filter(apiId -> apiId != null)
+            .collect(java.util.stream.Collectors.toCollection(HashSet::new));
+
+        List<Game> gamesToDelete = gameRepository.findAllByApiIdNotNull().stream()
+            .filter(game -> !currentApiIds.contains(game.getApiId()))
+            .toList();
+
+        if (!gamesToDelete.isEmpty()) {
+            gameRepository.deleteAll(gamesToDelete);
+        }
+    }
+
+    private Game upsertGame(FreeToGameApiResponse apiGame) {
+        Game game = findExistingGame(apiGame.id()).orElseGet(Game::new);
+        game.setApiId(apiGame.id());
+        game.setTitle(truncate(apiGame.title(), 120));
+        game.setGenre(truncate(defaultValue(apiGame.genre(), "Unknown"), 80));
+        game.setReleaseYear(extractYear(apiGame.releaseDate()));
+        game.setDescription(truncate(defaultValue(apiGame.shortDescription(), "Imported from FreeToGame."), 2000));
+        game.setCoverUrl(truncate(apiGame.thumbnail(), 500));
+        return game;
+    }
+
+    private Optional<Game> findExistingGame(Long apiId) {
+        if (apiId == null) {
+            return Optional.empty();
+        }
+
+        return gameRepository.findByApiId(apiId);
     }
 
     private Integer extractYear(String releaseDate) {
