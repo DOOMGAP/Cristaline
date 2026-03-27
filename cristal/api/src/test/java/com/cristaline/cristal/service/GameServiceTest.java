@@ -26,11 +26,14 @@ class GameServiceTest {
     @Mock
     private GameRepository gameRepository;
 
+    @Mock
+    private EventPublisherService eventPublisherService;
+
     private GameService gameService;
 
     @BeforeEach
     void setUp() {
-        gameService = new GameService(gameRepository);
+        gameService = new GameService(gameRepository, eventPublisherService);
     }
 
     @Test
@@ -57,6 +60,7 @@ class GameServiceTest {
         ArgumentCaptor<Game> captor = ArgumentCaptor.forClass(Game.class);
         verify(gameRepository).save(captor.capture());
         assertThat(captor.getValue().getGenre()).isEqualTo("Rogue-like");
+        verify(eventPublisherService).publishGameCreated(response);
     }
 
     @Test

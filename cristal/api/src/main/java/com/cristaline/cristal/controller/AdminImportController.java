@@ -1,6 +1,6 @@
 package com.cristaline.cristal.controller;
 
-import com.cristaline.cristal.service.ImportService;
+import com.cristaline.cristal.service.EventPublisherService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/import")
 public class AdminImportController {
 
-    private final ImportService importService;
+    private final EventPublisherService eventPublisherService;
 
-    public AdminImportController(ImportService importService) {
-        this.importService = importService;
+    public AdminImportController(EventPublisherService eventPublisherService) {
+        this.eventPublisherService = eventPublisherService;
     }
 
     @PostMapping("/freetogame")
     public ResponseEntity<Void> importFromFreeToGame() {
-        importService.refreshFromFreeToGame();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        eventPublisherService.publishImportRequest("admin-api");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 }
