@@ -26,11 +26,14 @@ class GameServiceTest {
     @Mock
     private GameRepository gameRepository;
 
+    @Mock
+    private EventPublisherService eventPublisherService;
+
     private GameService gameService;
 
     @BeforeEach
     void setUp() {
-        gameService = new GameService(gameRepository);
+        gameService = new GameService(gameRepository, eventPublisherService);
     }
 
     @Test
@@ -56,13 +59,15 @@ class GameServiceTest {
 
         ArgumentCaptor<Game> captor = ArgumentCaptor.forClass(Game.class);
         verify(gameRepository).save(captor.capture());
+        assertThat(captor.getValue().getApiId()).isNull();
         assertThat(captor.getValue().getGenre()).isEqualTo("Rogue-like");
+        verify(eventPublisherService).publishGameCreated(response);
     }
 
     @Test
     void shouldReturnFilteredGames() {
         when(gameRepository.findAll(any(Specification.class)))
-            .thenReturn(List.of(new Game(1L, "Celeste", "Platformer", 2018, "desc", null)));
+            .thenReturn(List.of(new Game(1L, null, "Celeste", "Platformer", 2018, "desc", null)));
 
         var result = gameService.listGames("cele", "Platformer", 2018);
 
