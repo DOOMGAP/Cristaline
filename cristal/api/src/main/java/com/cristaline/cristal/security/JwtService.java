@@ -19,7 +19,7 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS256, SECRET)
                 .compact();
     }
-
+/*
     public String extractUsername(String token) {
 
         return Jwts.builder()
@@ -28,4 +28,6 @@ public class JwtService {
                 .getBody()
                 .getSubject();
     }
+
+ */
 }
