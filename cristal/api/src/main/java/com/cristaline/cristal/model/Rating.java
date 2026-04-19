@@ -25,26 +25,22 @@ public class Rating {
     private Long gameId;
 
     @Column(nullable = false)
-    private int rating;
-
-    private String comment;
+    private Double rating;
 
     @Column(nullable = false)
     private Instant ratedAt;
 
     public Rating() {}
 
-    public Rating(User user, Long gameId, int rating, String comment) {
+    public Rating(User user, Long gameId, Double rating) {
         this.user = user;
         this.gameId = gameId;
         this.rating = rating;
-        this.comment = comment;
         this.ratedAt = Instant.now();
     }
 
-    public void updateRating(int rating, String comment) {
+    public void updateRating(Double rating) {
         this.rating = rating;
-        this.comment = comment;
         this.ratedAt = Instant.now();
     }
 
@@ -52,9 +48,7 @@ public class Rating {
 
     public Long getGameId() { return gameId; }
 
-    public int getRating() { return rating; }
-
-    public String getComment() { return comment; }
+    public Double getRating() { return rating; }
 
     public Instant getRatedAt() { return ratedAt; }
 
