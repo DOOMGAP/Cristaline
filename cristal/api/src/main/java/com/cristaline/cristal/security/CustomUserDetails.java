@@ -1,18 +1,18 @@
 package com.cristaline.cristal.security;
 
 import com.cristaline.cristal.model.User;
+
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
-@Service
-public class CustomUserDetailsService implements UserDetails {
+
+public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
-    public CustomUserDetailsService(User user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 

@@ -16,7 +16,7 @@ public class User {
     private String username;
 
     @Column(nullable = false, length = 24)
-    private String password;
+    private String password; // Hash password
 
     @Column(nullable = false, length = 120)
     private String email;
@@ -25,6 +25,11 @@ public class User {
     @CollectionTable(name = "user_favorite_games", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "game_id")
     private Set<Long> favoriteGamesIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "roles")
+    private Set<String> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratedGames = new ArrayList<>();
@@ -37,13 +42,14 @@ public class User {
 
     public User() {}
 
-    public User(Long id, String username, String email, String password)
+    public User(String username, String email, String password)
     {
-        this.id = id;
         this.username = username;
         this.email = email;
+        this.password = password;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+        roles.add("USER");
     }
 
     public void addFavorite(Long gameId) {
@@ -83,4 +89,8 @@ public class User {
     public Instant getCreatedAt() { return createdAt; }
 
     public Instant getUpdatedAt() { return updatedAt; }
+
+    public String getPassword() { return password; }
+
+    public Set<String> getRoles() { return roles; }
 }
