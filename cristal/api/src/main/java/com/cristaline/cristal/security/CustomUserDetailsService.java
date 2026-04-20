@@ -1,43 +1,24 @@
 package com.cristaline.cristal.security;
 
 import com.cristaline.cristal.model.User;
+import com.cristaline.cristal.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
 @Service
-public class CustomUserDetailsService implements UserDetails {
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
 
-    private final User user;
+    private final UserRepository userRepository;
 
-    public CustomUserDetailsService(User user) {
-        this.user = user;
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByUsername(username).isPresent() ?  userRepository.findByUsername(username).get() : null;
+        return new CustomUserDetails(user);
     }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-    }
-
-    @Override
-    public String getPassword() { return user.getPassword(); }
-
-    @Override
-    public String getUsername() { return user.getUsername(); }
-
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    @Override
-    public boolean isEnabled() { return true; }
 }

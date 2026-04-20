@@ -1,8 +1,17 @@
 package com.cristaline.cristal.service;
 
+import com.cristaline.cristal.dto.AuthRequest;
+import com.cristaline.cristal.dto.RegisterRequest;
 import com.cristaline.cristal.exception.UserNotFoundException;
 import com.cristaline.cristal.model.User;
 import com.cristaline.cristal.repository.UserRepository;
+import com.cristaline.cristal.security.CustomUserDetails;
+import com.cristaline.cristal.security.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -11,64 +20,27 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthService(UserRepository userRepository) { this.userRepository = userRepository; }
-
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
+        public String register(RegisterRequest request) {
+            User newUser = new User(request.username(), request.email(), request.password());
+            userRepository.save(newUser);
+            CustomUserDetails customUserDetails = new CustomUserDetails(newUser);
+            return jwtService.generateToken(customUserDetails);
         }
-        return hexString.toString();
-    }
 
-    public void register(String username, String email, String password)
-    {
-        if (!userRepository.existsByEmail(email))
-        {
-            // Sha-256 hash for the password
-            MessageDigest digest = null;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            byte[] encodedPass = digest.digest(
-                    password.getBytes(StandardCharsets.UTF_8));
-            User user = new User(username, email, bytesToHex(encodedPass));
-            userRepository.save(user);
+        public String login(AuthRequest request) {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.username(), request.password())
+            );
+            var user = userRepository.findByUsername(request.username()).orElseThrow();
+
+            return jwtService.generateToken(new CustomUserDetails(user));
         }
     }
-
-    public void login(String username, String password)
-    {
-        if (userRepository.existsByUsername(username))
-        {
-            MessageDigest digest = null;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            byte[] encodedPass = digest.digest(
-                    password.getBytes(StandardCharsets.UTF_8));
-            User foundUser = userRepository.findUserByUsername(username).isPresent() ? userRepository.findUserByUsername(username).get() : null;
-            if (foundUser != null && bytesToHex(encodedPass).matches(foundUser.getPassword()))
-            {
-                // login successful
-            }
-        }
-        else
-        {
-            throw new UserNotFoundException("User does not exist.");
-        }
-    }
-}
