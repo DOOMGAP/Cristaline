@@ -24,7 +24,7 @@ import { Game } from '../../data/game.model';
           <option *ngFor="let g of availableGenres" [value]="g">{{ g }}</option>
         </select>
         
-        <input type="number" placeholder="Annee" formControlName="year">
+        <input type="number" placeholder="Annee" formControlName="year" min="0" step="1" (keypress)="$event.charCode >= 48 && $event.charCode <= 57">
         <button type="submit">Filtrer</button>
       </form>
     </section>
@@ -155,14 +155,12 @@ export class GamesListPage {
   private readonly api = inject(GamesApi);
   private readonly fb = inject(FormBuilder);
 
-  // Votre liste de genres copiée/collée
   readonly availableGenres = [
     'ARPG', 'Action', 'Action Game', 'Battle Royale', 'Card Game', 
     'Dungeon Crawler', 'Fighting', 'MMO', 'MMOARPG', 'MMORPG', 'MOBA', 
     'RPG', 'Racing', 'Shooter', 'Social', 'Sports', 'Strategy'
   ];
 
-  // Le formulaire d'origine (genre est juste une chaîne de caractères)
   readonly filters = this.fb.nonNullable.group({
     title: [''],
     genre: [''],
