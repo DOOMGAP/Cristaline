@@ -15,6 +15,9 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "api_id")
+    private Long apiId;
+
     @Column(nullable = false, length = 120)
     private String title;
 
@@ -33,8 +36,9 @@ public class Game {
     public Game() {
     }
 
-    public Game(Long id, String title, String genre, Integer releaseYear, String description, String coverUrl) {
+    public Game(Long id, Long apiId, String title, String genre, Integer releaseYear, String description, String coverUrl) {
         this.id = id;
+        this.apiId = apiId;
         this.title = title;
         this.genre = genre;
         this.releaseYear = releaseYear;
@@ -48,6 +52,14 @@ public class Game {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getApiId() {
+        return apiId;
+    }
+
+    public void setApiId(Long apiId) {
+        this.apiId = apiId;
     }
 
     public String getTitle() {

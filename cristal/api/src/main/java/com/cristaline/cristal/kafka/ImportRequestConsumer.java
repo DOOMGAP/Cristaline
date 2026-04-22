@@ -1,7 +1,26 @@
 package com.cristaline.cristal.kafka;
 
+import com.cristaline.cristal.service.ImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ImportRequestConsumer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportRequestConsumer.class);
+
+    private final ImportService importService;
+
+    public ImportRequestConsumer(ImportService importService) {
+        this.importService = importService;
+    }
+
+    @KafkaListener(topics = "${app.kafka.topics.import-requests}")
+    public void consume(ImportRequestEvent event) {
+        LOGGER.info("Received import request from {} requested by {}", event.source(), event.requestedBy());
+        int importedCount = importService.refreshFromFreeToGame();
+        LOGGER.info("Imported {} games after Kafka request", importedCount);
+    }
 }
