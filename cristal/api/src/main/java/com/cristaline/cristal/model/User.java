@@ -20,7 +20,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 32)
     private String username;
 
-    @Column(nullable = false, length = 24)
+    @Column(nullable = false, length = 2048)
     private String password; // Hash password
 
     @Column(nullable = false, length = 120)

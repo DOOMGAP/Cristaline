@@ -1,16 +1,22 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './features/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
+    <main class="container">
+      <router-outlet></router-outlet>
+    </main>
     <div class="shell">
       <header class="topbar">
         <a class="brand" routerLink="/games">Cristal</a>
         <nav>
           <a routerLink="/games" routerLinkActive="active">Catalogue</a>
+          <a routerLink="/favorites" routerLinkActive="active">Favoris</a>
           <a routerLink="/admin/games" routerLinkActive="active">Admin</a>
         </nav>
       </header>
