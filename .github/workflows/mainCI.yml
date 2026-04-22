@@ -55,6 +55,7 @@ jobs:
           node-version: '18'
       - name: Install & Test
         run: |
+          npm install --save-dev webpack webpack-dev-server
           npm ci --legacy-peer-deps
           npm run test -- --watch=false --browsers=ChromeHeadless
         working-directory: cristal/front
