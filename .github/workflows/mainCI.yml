@@ -55,9 +55,7 @@ jobs:
           node-version: '18'
       - name: Install & Test
         run: |
-          npm cache clean --force
-          npm install
-          npm ci
+          npm ci --legacy-peer-deps
           npm run test -- --watch=false --browsers=ChromeHeadless
         working-directory: cristal/front
 
