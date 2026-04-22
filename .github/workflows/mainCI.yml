@@ -57,7 +57,7 @@ jobs:
         run: npm ci --legacy-peer-deps
         working-directory: cristal/front
       - name: Force Webpack for Karma
-        run: npm install --save-dev webpack webpack-dev-server
+        run: npm install --legacy-peer-deps --save-dev webpack webpack-dev-server
         working-directory: cristal/front
       - name: Run tests
         run : npm run test -- --watch=false --browsers=ChromeHeadless
