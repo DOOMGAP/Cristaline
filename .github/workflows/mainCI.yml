@@ -53,13 +53,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Install & Test
-        run: |
-          npm install --save-dev webpack webpack-dev-server
-          npm ci --legacy-peer-deps
-          npm run test -- --watch=false --browsers=ChromeHeadless
+      - name: Install dependencies
+        run: npm ci
         working-directory: cristal/front
-
+      - name: Force Webpack for Karma
+        run: npm install --save-dev webpack webpack-dev-server
+        working-directory: cristal/front
+      - name: Run tests
+        run : npm run test -- --watch=false --browsers=ChromeHeadless
+        working-directory: cristal/front
   # 3. Build & Push Docker Images
   build-and-push:
     needs: [backend-tests, frontend-tests, security-and-quality]
