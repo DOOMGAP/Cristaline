@@ -18,8 +18,13 @@ import { Game } from '../../data/game.model';
       </div>
       <form [formGroup]="filters" (ngSubmit)="loadGames()" class="filters">
         <input type="text" placeholder="Titre" formControlName="title">
-        <input type="text" placeholder="Genre" formControlName="genre">
-        <input type="number" placeholder="Annee" formControlName="year">
+        
+        <select formControlName="genre" title="Choisir un genre">
+          <option value="">Tous les genres</option>
+          <option *ngFor="let g of availableGenres" [value]="g">{{ g }}</option>
+        </select>
+        
+        <input type="number" placeholder="Annee" formControlName="year" min="0" step="1" (keypress)="$event.charCode >= 48 && $event.charCode <= 57">
         <button type="submit">Filtrer</button>
       </form>
     </section>
@@ -80,10 +85,15 @@ import { Game } from '../../data/game.model';
       align-content: start;
     }
 
-    input, button, a {
+    /* AJOUT DE 'select' ICI pour garantir un affichage identique aux inputs */
+    input, select, button, a {
       border-radius: 14px;
       border: 1px solid var(--border);
       padding: 12px 14px;
+      background-color: white; /* Fond blanc propre pour le select */
+      font-family: inherit;
+      font-size: 1rem;
+      color: inherit;
     }
 
     button, a {
@@ -144,6 +154,12 @@ import { Game } from '../../data/game.model';
 export class GamesListPage {
   private readonly api = inject(GamesApi);
   private readonly fb = inject(FormBuilder);
+
+  readonly availableGenres = [
+    'ARPG', 'Action', 'Action Game', 'Battle Royale', 'Card Game', 
+    'Dungeon Crawler', 'Fighting', 'MMO', 'MMOARPG', 'MMORPG', 'MOBA', 
+    'RPG', 'Racing', 'Shooter', 'Social', 'Sports', 'Strategy'
+  ];
 
   readonly filters = this.fb.nonNullable.group({
     title: [''],
