@@ -2,9 +2,9 @@ name: CI/CD Cristal Fullstack
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   # 1. Analyse Statique & Sécurité Dépendances
@@ -19,7 +19,7 @@ jobs:
       - name: Snyk Backend Scan
         uses: snyk/actions/maven@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SYNK_TOKEN }}
         with:
           args: --file=cristal/api/pom.xml
 
@@ -27,7 +27,7 @@ jobs:
       - name: Snyk Frontend Scan
         uses: snyk/actions/node@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SYNK_TOKEN }}
         with:
           args: cristal/front
 
