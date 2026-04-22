@@ -30,7 +30,7 @@ public class RatingController {
         try {
             // Get or create default user
             User user = userRepository.findById(1L).orElseGet(() -> {
-                User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
+                User defaultUser = new User("demo_user", "demo@example.com", "password");
                 return userRepository.save(defaultUser);
             });
 
@@ -74,7 +74,7 @@ public class RatingController {
             } else {
                 // Create or get default user for demo purposes
                 user = userRepository.findById(1L).orElseGet(() -> {
-                    User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
+                    User defaultUser = new User("demo_user", "demo@example.com", "password");
                     return userRepository.save(defaultUser);
                 });
             }
