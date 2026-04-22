@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
@@ -14,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET = "cristalline_secret_key";
+    private final String SECRET = "oursupersecurecristallineprojectssecretkey";
 
     public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
@@ -28,7 +29,7 @@ public class JwtService {
 
     public Key getSignInKey()
     {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = SECRET.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

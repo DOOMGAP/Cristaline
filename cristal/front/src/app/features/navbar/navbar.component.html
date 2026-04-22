@@ -1,0 +1,13 @@
+<nav class="navbar">
+
+    <div class="spacer"></div>
+    <div *ngIf="(authService.currentUser$ | async) as username; else loginBtn">
+        <span class="welcome-text">Bonjour, <strong>{{ username }}</strong></span>
+        <button mat-raised-button class="custom-auth-btn" (click)="authService.logout()">Déconnexion</button>
+    </div>
+    <ng-template #loginBtn>
+        <button mat-raised-button class="custom-auth-btn" (click)="openAuth()">
+            Connexion / Inscription
+        </button>
+    </ng-template>
+</nav>

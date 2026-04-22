@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -29,12 +30,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
         public String register(RegisterRequest request) {
-            User newUser = new User(request.username(), request.email(), request.password());
+            User newUser = new User(request.username(), request.email(), passwordEncoder.encode(request.password()));
             userRepository.save(newUser);
             CustomUserDetails customUserDetails = new CustomUserDetails(newUser);
             return jwtService.generateToken(customUserDetails);
         }
 
+        @Transactional
         public String login(AuthRequest request) {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
