@@ -48,4 +48,5 @@ jobs:
 
       # 7. (Optionnel) Vérification Docker
       - name: Build Docker images
+        working-directory: cristal
         run: docker compose build
