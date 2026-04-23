@@ -53,7 +53,7 @@ jobs:
         working-directory: cristal
         run: docker compose build
 
- release-production:
+  release-production:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
