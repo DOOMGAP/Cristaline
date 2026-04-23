@@ -8,10 +8,12 @@ on:
 
 jobs:
 
-  security-and-quality:
+  security-check:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Important pour SonarCloud
 
@@ -30,18 +32,11 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SYNK_TOKEN }}
         with:
           args: cristal/front
-
-  basic-check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
+          
       - name: Verify repository structure
         run: |
           echo "Repository successfully checked out"
           ls -la
 
       - name: CI Success
-        run: echo "GitHub Actions is working correctly"
+        run: echo "Security check complete"
