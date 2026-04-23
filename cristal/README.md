@@ -75,3 +75,15 @@ Le conteneur front doit rediriger les routes applicatives vers `index.html`. Apr
 ```bash
 docker compose up --build front
 ```
+
+
+Pour installer l'image: 
+
+Telecharger les tar de la derniere release
+
+```bash
+docker load < cristaline-api.tar
+docker run -p votre_port:votre_port cristaline-api:latest
+```
+
+Pour l'api, meme chose pour le front en remplacant api par front.
