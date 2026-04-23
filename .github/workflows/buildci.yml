@@ -64,14 +64,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Build Docker Images
         working-directory: cristal
         run: |
-          # On build les images localement sur le runner
           docker build -t cristaline-api:latest ./api
           docker build -t cristaline-front:latest ./front
 
-      # 1. On transforme les images Docker en fichiers .tar physiques
+      # 1. On transforme les images Docker en fichiers .tar
       - name: Save Docker images to tarballs
         run: |
           docker save cristaline-api:latest > cristaline-api.tar
@@ -103,6 +103,3 @@ jobs:
           docker tag cristaline-front:latest ghcr.io/${REPO_NAME}-front:latest
           docker push ghcr.io/${REPO_NAME}-api:latest
           docker push ghcr.io/${REPO_NAME}-front:latest
-
-          docker push $API_IMAGE --all-tags
-          docker push $FRONT_IMAGE --all-tags
