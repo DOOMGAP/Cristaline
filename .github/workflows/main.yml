@@ -7,6 +7,30 @@ on:
     branches: [ main ]
 
 jobs:
+
+  security-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Important pour SonarCloud
+
+      # Scan des vulnérabilités Maven (Backend)
+      - name: Snyk Backend Scan
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SYNK_TOKEN }}
+        with:
+          args: --file=cristal/api/pom.xml
+
+      # Scan des vulnérabilités NPM (Frontend)
+      - name: Snyk Frontend Scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SYNK_TOKEN }}
+        with:
+          args: cristal/front
+
   basic-check:
     runs-on: ubuntu-latest
 
