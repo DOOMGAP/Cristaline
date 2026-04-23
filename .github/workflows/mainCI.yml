@@ -77,6 +77,6 @@ jobs:
           username: ${{ secrets.PROD_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
-            cd /path/to/cristal
+            cd /cristal
             docker-compose pull
             docker-compose up -d
