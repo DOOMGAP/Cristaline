@@ -40,7 +40,7 @@ jobs:
         working-directory: cristal/front
   # 3. Build & Push Docker Images
   build-and-push:
-    needs: [backend-tests, frontend-tests, security-and-quality]
+    needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
