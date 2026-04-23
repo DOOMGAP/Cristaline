@@ -1,0 +1,40 @@
+name: CI - Tests
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  # 2. Tests et Qualité Code
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Run Maven Tests (H2)
+        run: mvn test
+        working-directory: cristal/api
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        working-directory: cristal/front
+      - name: Force Webpack for Karma
+        run: npm install --legacy-peer-deps --save-dev webpack webpack-dev-server
+        working-directory: cristal/front
+      - name: Run tests
+        run : npm run test -- --watch=false --browsers=ChromeHeadless
+        working-directory: cristal/front

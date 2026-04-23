@@ -1,12 +1,14 @@
 package com.cristaline.cristal.service;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.cristaline.cristal.model.Rating;
 import com.cristaline.cristal.model.User;
 import com.cristaline.cristal.repository.RatingRepository;
 import com.cristaline.cristal.repository.UserRepository;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class RatingService {
@@ -29,5 +31,13 @@ public class RatingService {
         }
 
         return ratingRepository.save(ratingObj);
+    }
+
+    public Double getAverageRating(Long gameId) {
+        return ratingRepository.findAverageByGameId(gameId);
+    }
+
+    public Long getRatingsCount(Long gameId) {
+        return ratingRepository.countByGameId(gameId);
     }
 }

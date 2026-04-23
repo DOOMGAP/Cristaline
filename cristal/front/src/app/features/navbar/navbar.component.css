@@ -1,0 +1,21 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 64px;
+    background-color: #d45a33;
+    color: white;
+}
+.spacer { flex: 1 1 auto; }
+
+.custom-auth-btn {
+    background-color: white !important;
+    color: black !important;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: transform 0.2s;
+}
+
+.welcome-text {
+    margin-right: 20px;
+}

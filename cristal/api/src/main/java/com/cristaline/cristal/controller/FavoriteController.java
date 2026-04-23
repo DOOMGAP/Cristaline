@@ -1,5 +1,19 @@
 package com.cristaline.cristal.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.cristaline.cristal.dto.FavoriteStatusResponse;
 import com.cristaline.cristal.dto.GameResponse;
 import com.cristaline.cristal.model.Favorite;
@@ -8,17 +22,6 @@ import com.cristaline.cristal.model.User;
 import com.cristaline.cristal.repository.GameRepository;
 import com.cristaline.cristal.repository.UserRepository;
 import com.cristaline.cristal.service.FavoriteService;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping
@@ -34,20 +37,21 @@ public class FavoriteController {
     private GameRepository gameRepository;
 
     @PostMapping("/games/{id}/favorites")
-    public ResponseEntity<?> addFavorite(@PathVariable Long id) {
+    public ResponseEntity<?> addFavorite(@PathVariable Long id, Authentication authentication) {
         try {
-            // Get or create default user
-            User user = userRepository.findById(1L).orElseGet(() -> {
-                User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
-                return userRepository.save(defaultUser);
-            });
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+            }
+
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
             // Check if game exists
             Game game = gameRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Game not found with id: " + id));
 
             // Add to favorites
-            Favorite favorite = favoriteService.addFavorite(user, id);
+            favoriteService.addFavorite(user, id);
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -58,13 +62,14 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/games/{id}/favorites")
-    public ResponseEntity<?> removeFavorite(@PathVariable Long id) {
+    public ResponseEntity<?> removeFavorite(@PathVariable Long id, Authentication authentication) {
         try {
-            // Get or create default user
-            User user = userRepository.findById(1L).orElseGet(() -> {
-                User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
-                return userRepository.save(defaultUser);
-            });
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+            }
+
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
             // Remove from favorites
             favoriteService.removeFavorite(user, id);
@@ -78,13 +83,14 @@ public class FavoriteController {
     }
 
     @GetMapping("/games/{gameId}/favorites/user")
-    public ResponseEntity<FavoriteStatusResponse> isFavorited(@PathVariable Long gameId) {
+    public ResponseEntity<FavoriteStatusResponse> isFavorited(@PathVariable Long gameId, Authentication authentication) {
         try {
-            // Get or create default user
-            User user = userRepository.findById(1L).orElseGet(() -> {
-                User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
-                return userRepository.save(defaultUser);
-            });
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
             boolean isFavorited = favoriteService.isFavorited(user, gameId);
             return ResponseEntity.ok(new FavoriteStatusResponse(isFavorited));
@@ -96,13 +102,14 @@ public class FavoriteController {
     }
 
     @GetMapping("/me/favorites")
-    public ResponseEntity<?> getMyFavorites() {
+    public ResponseEntity<?> getMyFavorites(Authentication authentication) {
         try {
-            // Get or create default user
-            User user = userRepository.findById(1L).orElseGet(() -> {
-                User defaultUser = new User(1L, "demo_user", "demo@example.com", "password");
-                return userRepository.save(defaultUser);
-            });
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+            }
+
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
             List<Favorite> favorites = favoriteService.getUserFavorites(user.getId());
 
