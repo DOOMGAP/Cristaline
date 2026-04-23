@@ -25,7 +25,7 @@ jobs:
 
       # 3. Build + tests backend
       - name: Build and test backend
-        working-directory: ./api
+        working-directory: cristal/api
         run: mvn clean verify
 
       # 4. Setup Node (Frontend)
@@ -34,16 +34,16 @@ jobs:
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: ./front/package-lock.json
+          cache-dependency-path: cristal/front/package-lock.json
 
       # 5. Install dépendances frontend
       - name: Install frontend dependencies
-        working-directory: ./front
+        working-directory: cristal/front
         run: npm install
 
       # 6. Build frontend Angular
       - name: Build frontend
-        working-directory: ./front
+        working-directory: cristal/front
         run: npm run build --if-present
 
       # 7. (Optionnel) Vérification Docker
