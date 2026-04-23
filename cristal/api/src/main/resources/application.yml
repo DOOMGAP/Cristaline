@@ -37,3 +37,5 @@ app:
     topics:
       game-events: game-events
       import-requests: import-requests
+  seed:
+    enabled: ${APP_SEED_ENABLED:true}

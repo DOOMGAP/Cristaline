@@ -13,29 +13,29 @@ import {MatButtonModule} from "@angular/material/button";
   template: `
     <h2 mat-dialog-title>{{ isLogin ? 'Connexion' : 'Inscription' }}</h2>
     <mat-dialog-content>
-      <form [formGroup]="authForm">
+      <form [formGroup]="authForm" data-testid="auth-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
-          <input matInput formControlName="username">
+          <input matInput formControlName="username" data-testid="auth-username">
         </mat-form-field>
 
         <mat-form-field *ngIf="!isLogin" appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email">
+          <input matInput type="email" formControlName="email" data-testid="auth-email">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Mot de passe</mat-label>
-          <input matInput type="password" formControlName="password">
+          <input matInput type="password" formControlName="password" data-testid="auth-password">
         </mat-form-field>
       </form>
-      <a (click)="isLogin = !isLogin" class="toggle-link">
+      <a (click)="isLogin = !isLogin" class="toggle-link" data-testid="auth-toggle">
         {{ isLogin ? "Pas de compte ? S'inscrire" : "Déjà inscrit ? Se connecter" }}
       </a>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>Annuler</button>
-      <button mat-raised-button color="primary" (click)="submit()">Valider</button>
+      <button mat-raised-button color="primary" (click)="submit()" data-testid="auth-submit">Valider</button>
     </mat-dialog-actions>
   `
 })

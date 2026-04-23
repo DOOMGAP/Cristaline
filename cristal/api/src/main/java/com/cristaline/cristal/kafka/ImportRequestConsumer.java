@@ -20,6 +20,10 @@ public class ImportRequestConsumer {
         this.importService = importService;
     }
 
+    /**
+     * Only enabled in the prod profile because dev uses H2 and local synchronous
+     * workflows. Docker/prod routes the admin import through Kafka.
+     */
     @KafkaListener(topics = "${app.kafka.topics.import-requests}")
     public void consume(ImportRequestEvent event) {
         LOGGER.info("Received import request from {} requested by {}", event.source(), event.requestedBy());

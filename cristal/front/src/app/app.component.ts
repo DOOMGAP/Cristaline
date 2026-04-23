@@ -10,11 +10,12 @@ import { NavbarComponent } from './features/navbar/navbar.component';
     <div class="shell">
       <app-navbar></app-navbar>
       <header class="topbar">
-        <a class="brand" routerLink="/games">Cristal</a>
+        <a class="brand" routerLink="/games" data-testid="brand-link">Cristal</a>
         <nav>
-          <a routerLink="/games" routerLinkActive="active">Catalogue</a>
-          <a routerLink="/favorites" routerLinkActive="active">Favoris</a>
-          <a routerLink="/admin/games" routerLinkActive="active">Admin</a>
+          <a routerLink="/games" routerLinkActive="active" data-testid="nav-games">Catalogue</a>
+          <a routerLink="/favorites" routerLinkActive="active" data-testid="nav-favorites">Favoris</a>
+          <a routerLink="/admin/games" routerLinkActive="active" data-testid="nav-admin-games">Admin</a>
+          <a routerLink="/admin/import" routerLinkActive="active" data-testid="nav-admin-import">Import</a>
         </nav>
       </header>
 

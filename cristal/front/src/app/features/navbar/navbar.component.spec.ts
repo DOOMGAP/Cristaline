@@ -1,50 +1,44 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavbarComponent } from './navbar.component';
 import { AuthService } from '../auth/auth.service';
-import { of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { MatDialogModule } from '@angular/material/dialog';
 
-// @ts-ignore
 describe('NavbarComponent', () => {
-    let component: NavbarComponent;
-    let fixture: ComponentFixture<NavbarComponent>;
-    let authServiceMock: any;
+  let component: NavbarComponent;
+  let fixture: ComponentFixture<NavbarComponent>;
+  let authServiceMock: { currentUser$: BehaviorSubject<string | null>; logout: jasmine.Spy };
+  let currentUserSubject: BehaviorSubject<string | null>;
 
-    // @ts-ignore
-    beforeEach(async () => {
-        // Création d'un mock pour le service
-        authServiceMock = {
-            currentUser$: of(null), // Utilisateur déconnecté par défaut
-            // @ts-ignore
-            logout: jasmine.createSpy('logout')
-        };
+  beforeEach(async () => {
+    currentUserSubject = new BehaviorSubject<string | null>(null);
+    authServiceMock = {
+      currentUser$: currentUserSubject,
+      logout: jasmine.createSpy('logout')
+    };
 
-        await TestBed.configureTestingModule({
-            imports: [NavbarComponent, MatDialogModule],
-            providers: [
-                { provide: AuthService, useValue: authServiceMock }
-            ]
-        }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [NavbarComponent, MatDialogModule],
+      providers: [
+        { provide: AuthService, useValue: authServiceMock }
+      ]
+    }).compileComponents();
 
-        fixture = TestBed.createComponent(NavbarComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
+    fixture = TestBed.createComponent(NavbarComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-    // @ts-ignore
-    it('should display "Connexion" button when user is not logged in', () => {
-        const compiled = fixture.nativeElement;
-        // @ts-ignore
-        expect(compiled.querySelector('button').textContent).toContain('Connexion');
-    });
+  it('should display "Connexion" button when user is not logged in', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('[data-testid="login-button"]')?.textContent).toContain('Connexion');
+  });
 
-    // @ts-ignore
-    it('should display "Bonjour" when user is logged in', () => {
-        authServiceMock.currentUser$ = of('Arona');
-        fixture.detectChanges(); // On force la mise à jour du HTML
+  it('should display "Bonjour" when user is logged in', () => {
+    currentUserSubject.next('Arona');
+    fixture.detectChanges();
 
-        const compiled = fixture.nativeElement;
-        // @ts-ignore
-        expect(compiled.textContent).toContain('Bonjour, Arona');
-    });
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Bonjour, Arona');
+  });
 });

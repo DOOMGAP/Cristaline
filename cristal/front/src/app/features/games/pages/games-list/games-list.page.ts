@@ -12,7 +12,7 @@ import { Game } from '../../data/game.model';
   template: `
     <section class="hero">
       <div>
-        <h1>Catalogue des jeux</h1>
+        <h1 data-testid="games-title">Catalogue des jeux</h1>
         <p class="lead">Recherche, filtrage et navigation vers les details du catalogue.</p>
       </div>
       <form [formGroup]="filters" (ngSubmit)="loadGames()" class="filters">
@@ -28,10 +28,10 @@ import { Game } from '../../data/game.model';
       </form>
     </section>
 
-    <p *ngIf="error" class="error">{{ error }}</p>
+    <p *ngIf="error" class="error" data-testid="games-error">{{ error }}</p>
 
-    <section class="grid">
-      <article *ngFor="let game of games" class="card">
+    <section class="grid" data-testid="games-grid">
+      <article *ngFor="let game of games" class="card" data-testid="game-card">
         <div class="cover" [style.background-image]="'url(' + (game.coverUrl || '') + ')'"></div>
         <div class="meta">
           <span>{{ game.genre }}</span>
@@ -39,7 +39,7 @@ import { Game } from '../../data/game.model';
         </div>
         <h2>{{ game.title }}</h2>
         <p>{{ game.description }}</p>
-        <a [routerLink]="['/games', game.id]">Voir le detail</a>
+        <a [routerLink]="['/games', game.id]" data-testid="game-detail-link">Voir le detail</a>
       </article>
     </section>
   `,

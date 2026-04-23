@@ -17,6 +17,9 @@ public class JwtService {
 
     private final String SECRET = "oursupersecurecristallineprojectssecretkey";
 
+    /**
+     * Generates the stateless API token used by the Angular application.
+     */
     public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
