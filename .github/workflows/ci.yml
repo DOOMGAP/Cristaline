@@ -48,4 +48,4 @@ jobs:
 
       # 7. (Optionnel) Vérification Docker
       - name: Build Docker images
-        run: docker-compose build
+        run: docker compose build
