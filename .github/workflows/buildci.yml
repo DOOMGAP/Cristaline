@@ -50,3 +50,36 @@ jobs:
       - name: Build Docker images
         working-directory: cristal
         run: docker compose build
+
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push Images
+        working-directory: cristal
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          API_IMAGE="ghcr.io/${REPO_NAME}-api"
+          FRONT_IMAGE="ghcr.io/${REPO_NAME}-front"
+        
+          docker build -t $API_IMAGE:latest -t $API_IMAGE:${{ github.sha }} ./api
+          docker build -t $FRONT_IMAGE:latest -t $FRONT_IMAGE:${{ github.sha }} ./front
+        
+          docker push $API_IMAGE:latest
+          docker push $API_IMAGE:${{ github.sha }}
+          docker push $FRONT_IMAGE:latest
+          docker push $FRONT_IMAGE:${{ github.sha }}
