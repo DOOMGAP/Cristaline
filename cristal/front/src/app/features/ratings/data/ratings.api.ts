@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Rating, RatingRequest } from './rating.model';
+import { Rating, RatingRequest, RatingSummary } from './rating.model';
 
 @Injectable({ providedIn: 'root' })
 export class RatingsApi {
@@ -10,15 +10,28 @@ export class RatingsApi {
 
   getRating(gameId: number): Observable<Rating> {
     return this.http.get<Rating>(
-      `${this.baseUrl}/games/${gameId}/ratings/user`
+      `${this.baseUrl}/games/${gameId}/ratings/user`,
+      { headers: this.buildAuthHeaders() }
     );
   }
 
   submitRating(gameId: number, payload: RatingRequest): Observable<Rating> {
     return this.http.post<Rating>(
       `${this.baseUrl}/games/${gameId}/ratings`,
-      payload
+      payload,
+      { headers: this.buildAuthHeaders() }
     );
+  }
+
+  getRatingSummary(gameId: number): Observable<RatingSummary> {
+    return this.http.get<RatingSummary>(
+      `${this.baseUrl}/games/${gameId}/ratings/summary`
+    );
+  }
+
+  private buildAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
   private resolveBaseUrl(): string {

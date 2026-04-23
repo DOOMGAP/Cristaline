@@ -60,7 +60,7 @@ export class AuthComponent {
     action.subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
-        this.authService.decodeAndSaveUser(res.token)
+        this.authService.decodeAndSaveUser(res.token);
         this.dialogRef.close();
       },
       error: (err) => console.error(err)

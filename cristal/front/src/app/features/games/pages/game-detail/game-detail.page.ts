@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { distinctUntilChanged, skip } from 'rxjs';
 import { GamesApi } from '../../data/games.api';
 import { RatingsApi } from '../../../ratings/data/ratings.api';
 import { FavoritesApi } from '../../../favorites/data/favorites.api';
+import { AuthService } from '../../../auth/auth.service';
 import { Game } from '../../data/game.model';
 
 @Component({
@@ -33,6 +36,12 @@ import { Game } from '../../data/game.model';
           </button>
         </div>
         <p>{{ game.description }}</p>
+        <p class="average-rating" *ngIf="ratingsCount > 0">
+          Note moyenne: {{ averageRatingText }} / 10 ({{ ratingsCount }} notes)
+        </p>
+        <p class="average-rating" *ngIf="ratingsCount === 0">
+          Note moyenne: pas encore de note.
+        </p>
 
         <!-- Rating Section -->
         <div class="rating-section">
@@ -174,6 +183,12 @@ import { Game } from '../../data/game.model';
       border-top: 1px solid var(--border);
     }
 
+    .average-rating {
+      margin: 0;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
     form {
       display: flex;
       flex-direction: column;
@@ -253,6 +268,8 @@ export class GameDetailPage {
   private readonly gamesApi = inject(GamesApi);
   private readonly ratingsApi = inject(RatingsApi);
   private readonly favoritesApi = inject(FavoritesApi);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
 
   game: Game | null = null;
@@ -264,7 +281,11 @@ export class GameDetailPage {
   isRatingChanged = false;
   isFavorited = false;
   isTogglingFavorite = false;
+  averageRatingText = '0.0';
+  ratingsCount = 0;
   private initialRating: any = null;
+  private ratingRequestSeq = 0;
+  private favoriteRequestSeq = 0;
 
   constructor() {
     this.ratingForm = this.fb.group({
@@ -287,6 +308,8 @@ export class GameDetailPage {
       next: (game) => {
         this.game = game;
         const gameId = parseInt(id);
+        this.resetUserSpecificState();
+        this.loadRatingSummary(gameId);
         this.loadExistingRating(gameId);
         this.loadFavoriteStatus(gameId);
       },
@@ -294,11 +317,50 @@ export class GameDetailPage {
         this.error = 'Jeu introuvable.';
       },
     });
+
+    // Reload per-user state when account changes without leaving the page.
+    this.authService.currentUser$
+      .pipe(skip(1), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.game) {
+          return;
+        }
+        this.resetUserSpecificState();
+        this.loadExistingRating(this.game.id);
+        this.loadFavoriteStatus(this.game.id);
+      });
+  }
+
+  private resetUserSpecificState() {
+    this.isFavorited = false;
+    this.hasExistingRating = false;
+    this.initialRating = null;
+    this.isRatingChanged = false;
+    this.ratingError = '';
+    this.ratingForm.patchValue({ rating: null }, { emitEvent: false });
+  }
+
+  private loadRatingSummary(gameId: number) {
+    this.ratingsApi.getRatingSummary(gameId).subscribe({
+      next: (summary) => {
+        this.ratingsCount = summary.ratingsCount ?? 0;
+        const average = summary.averageRating;
+        this.averageRatingText = average == null ? '0.0' : average.toFixed(1);
+      },
+      error: () => {
+        this.ratingsCount = 0;
+        this.averageRatingText = '0.0';
+      },
+    });
   }
 
   private loadExistingRating(gameId: number) {
+    const requestSeq = ++this.ratingRequestSeq;
     this.ratingsApi.getRating(gameId).subscribe({
       next: (rating) => {
+        if (requestSeq !== this.ratingRequestSeq) {
+          return;
+        }
         this.hasExistingRating = true;
         this.initialRating = { rating: rating.rating };
         this.ratingForm.patchValue({
@@ -307,19 +369,31 @@ export class GameDetailPage {
         this.isRatingChanged = false;
       },
       error: () => {
+        if (requestSeq !== this.ratingRequestSeq) {
+          return;
+        }
         // No existing rating, form stays empty
         this.hasExistingRating = false;
         this.initialRating = null;
+        this.ratingForm.patchValue({ rating: null });
+        this.isRatingChanged = false;
       },
     });
   }
 
   private loadFavoriteStatus(gameId: number) {
+    const requestSeq = ++this.favoriteRequestSeq;
     this.favoritesApi.isFavorited(gameId).subscribe({
       next: (response) => {
+        if (requestSeq !== this.favoriteRequestSeq) {
+          return;
+        }
         this.isFavorited = response.favorited;
       },
       error: () => {
+        if (requestSeq !== this.favoriteRequestSeq) {
+          return;
+        }
         // Error loading favorite status
         this.isFavorited = false;
       },
@@ -374,6 +448,12 @@ export class GameDetailPage {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.ratingError = 'Vous devez etre connecte pour noter un jeu.';
+      return;
+    }
+
     this.isSubmitting = true;
     this.ratingError = '';
 
@@ -381,10 +461,18 @@ export class GameDetailPage {
       next: () => {
         this.initialRating = { ...this.ratingForm.value };
         this.isRatingChanged = false;
+        this.loadRatingSummary(this.game!.id);
         this.isSubmitting = false;
       },
       error: (err) => {
-        this.ratingError = err.error?.message || err.error || 'Erreur lors de la soumission de la note.';
+        if (err.status === 401) {
+          this.authService.logout();
+          this.ratingError = 'Session expiree. Reconnectez-vous pour noter un jeu.';
+        } else if (err.status === 403) {
+          this.ratingError = 'Action refusee par le serveur. Reessayez apres reconnexion.';
+        } else {
+          this.ratingError = err.error?.message || err.error || 'Erreur lors de la soumission de la note.';
+        }
         this.isSubmitting = false;
       },
     });

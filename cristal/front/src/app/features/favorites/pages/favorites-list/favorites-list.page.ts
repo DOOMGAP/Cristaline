@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { distinctUntilChanged } from 'rxjs';
+import { AuthService } from '../../../auth/auth.service';
 import { FavoritesApi } from '../../data/favorites.api';
 import { Game } from '../../../games/data/game.model';
 
@@ -142,6 +145,8 @@ import { Game } from '../../../games/data/game.model';
 })
 export class FavoritesListPage {
   private readonly favoritesApi = inject(FavoritesApi);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   games: Game[] = [];
   error = '';
@@ -149,6 +154,14 @@ export class FavoritesListPage {
 
   constructor() {
     this.loadFavorites();
+
+    this.authService.currentUser$
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Clear stale data immediately when user changes.
+        this.games = [];
+        this.loadFavorites();
+      });
   }
 
   loadFavorites(): void {
