@@ -46,7 +46,7 @@ jobs:
         working-directory: cristal/front
         run: npm run build --if-present
 
-      # 7. (Optionnel) Vérification Docker
+      # 7. Vérification Docker
       - name: Build Docker images
         working-directory: cristal
         run: docker compose build
