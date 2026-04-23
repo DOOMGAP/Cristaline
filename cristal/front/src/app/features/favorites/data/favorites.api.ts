@@ -14,27 +14,36 @@ export class FavoritesApi {
 
   isFavorited(gameId: number): Observable<FavoriteStatusResponse> {
     return this.http.get<FavoriteStatusResponse>(
-      `${this.baseUrl}/games/${gameId}/favorites/user`
+      `${this.baseUrl}/games/${gameId}/favorites/user`,
+      { headers: this.buildAuthHeaders() }
     );
   }
 
   addFavorite(gameId: number): Observable<void> {
     return this.http.post<void>(
       `${this.baseUrl}/games/${gameId}/favorites`,
-      null
+      null,
+      { headers: this.buildAuthHeaders() }
     );
   }
 
   removeFavorite(gameId: number): Observable<void> {
     return this.http.delete<void>(
-      `${this.baseUrl}/games/${gameId}/favorites`
+      `${this.baseUrl}/games/${gameId}/favorites`,
+      { headers: this.buildAuthHeaders() }
     );
   }
 
   getMyFavorites(): Observable<Game[]> {
     return this.http.get<Game[]>(
-      `${this.baseUrl}/me/favorites`
+      `${this.baseUrl}/me/favorites`,
+      { headers: this.buildAuthHeaders() }
     );
+  }
+
+  private buildAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
   private resolveBaseUrl(): string {

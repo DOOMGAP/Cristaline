@@ -6,7 +6,7 @@ import {BehaviorSubject} from "rxjs";
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = `${this.resolveBaseUrl()}/auth`;
   private currentUserSubject = new BehaviorSubject<string | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -25,6 +25,9 @@ export class AuthService {
 
   decodeAndSaveUser(token: string){
       const decoded: any = jwtDecode(token);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        throw new Error('Token expired');
+      }
       const username = decoded.sub;
       this.currentUserSubject.next(username);
   }
@@ -40,5 +43,13 @@ export class AuthService {
 
   register(userData: any) {
     return this.http.post(`${this.apiUrl}/register`, userData);
+  }
+
+  private resolveBaseUrl(): string {
+    if (typeof window === 'undefined') {
+      return 'http://localhost:8080';
+    }
+
+    return `${window.location.protocol}//${window.location.hostname}:8080`;
   }
 }

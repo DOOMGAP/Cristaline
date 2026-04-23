@@ -1,12 +1,13 @@
 package com.cristaline.cristal.security;
 
-import com.cristaline.cristal.model.User;
+import java.util.Collection;
+import java.util.Set;
 
-import org.springframework.security.core.*;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import com.cristaline.cristal.model.User;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -18,7 +19,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
+        Set<String> roles = user.getRoles() == null ? Set.of() : user.getRoles();
+        return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }

@@ -7,11 +7,8 @@ import { NavbarComponent } from './features/navbar/navbar.component';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent],
   template: `
-    <app-navbar></app-navbar>
-    <main class="container">
-      <router-outlet></router-outlet>
-    </main>
     <div class="shell">
+      <app-navbar></app-navbar>
       <header class="topbar">
         <a class="brand" routerLink="/games">Cristal</a>
         <nav>
