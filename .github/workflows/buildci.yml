@@ -51,9 +51,9 @@ jobs:
         working-directory: cristal
         run: docker compose build
 
-  release-production:
+ release-production:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v') 
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -63,16 +63,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1. Création de la Release GitHub
-      - name: Create GitHub Release
-        id: create_release
+      - name: Build Docker Images
+        working-directory: cristal
+        run: |
+          # On build les images localement sur le runner
+          docker build -t cristaline-api:latest ./api
+          docker build -t cristaline-front:latest ./front
+
+      # 1. On transforme les images Docker en fichiers .tar physiques
+      - name: Save Docker images to tarballs
+        run: |
+          docker save cristaline-api:latest > cristaline-api.tar
+          docker save cristaline-front:latest > cristaline-front.tar
+
+      # 2. On crée la Release et on upload les .tar comme "Assets"
+      - name: Create GitHub Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
+          files: |
+            cristaline-api.tar
+            cristaline-front.tar
           generate_release_notes: true
           draft: false
           prerelease: false
 
-      # 2. Connexion au registre Docker
+      # 3. (Optionnel) On les pousse aussi sur GHCR (pour le docker pull)
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -80,18 +95,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3. Build et Push avec le numéro de version du Tag
-      - name: Build and Push Docker Images
-        working-directory: cristal
+      - name: Push to GHCR
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          TAG_NAME=${{ github.ref_name }}
-
-          API_IMAGE="ghcr.io/${REPO_NAME}-api"
-          FRONT_IMAGE="ghcr.io/${REPO_NAME}-front"
-
-          docker build -t $API_IMAGE:latest -t $API_IMAGE:$TAG_NAME ./api
-          docker build -t $FRONT_IMAGE:latest -t $FRONT_IMAGE:$TAG_NAME ./front
+          docker tag cristaline-api:latest ghcr.io/${REPO_NAME}-api:latest
+          docker tag cristaline-front:latest ghcr.io/${REPO_NAME}-front:latest
+          docker push ghcr.io/${REPO_NAME}-api:latest
+          docker push ghcr.io/${REPO_NAME}-front:latest
 
           docker push $API_IMAGE --all-tags
           docker push $FRONT_IMAGE --all-tags
