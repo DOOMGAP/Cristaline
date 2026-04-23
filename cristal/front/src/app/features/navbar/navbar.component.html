@@ -2,11 +2,11 @@
 
     <div class="spacer"></div>
     <div *ngIf="(authService.currentUser$ | async) as username; else loginBtn">
-        <span class="welcome-text">Bonjour, <strong>{{ username }}</strong></span>
-        <button mat-raised-button class="custom-auth-btn" (click)="authService.logout()">Déconnexion</button>
+        <span class="welcome-text" data-testid="current-user">Bonjour, <strong>{{ username }}</strong></span>
+        <button mat-raised-button class="custom-auth-btn" (click)="authService.logout()" data-testid="logout-button">Déconnexion</button>
     </div>
     <ng-template #loginBtn>
-        <button mat-raised-button class="custom-auth-btn" (click)="openAuth()">
+        <button mat-raised-button class="custom-auth-btn" (click)="openAuth()" data-testid="login-button">
             Connexion / Inscription
         </button>
     </ng-template>

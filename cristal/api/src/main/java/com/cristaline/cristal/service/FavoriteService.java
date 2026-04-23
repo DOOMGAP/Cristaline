@@ -14,6 +14,10 @@ public class FavoriteService {
     @Autowired
     private FavoriteRepository favoriteRepository;
 
+    /**
+     * Adds a favorite for the given user and game, reusing the existing row when
+     * the association already exists.
+     */
     public Favorite addFavorite(User user, Long gameId) {
         Optional<Favorite> existing = favoriteRepository.findByUserIdAndGameId(user.getId(), gameId);
         
@@ -25,6 +29,10 @@ public class FavoriteService {
         return favoriteRepository.save(favorite);
     }
 
+    /**
+     * Removes the favorite association when present. Missing favorites are a
+     * no-op to keep the endpoint idempotent.
+     */
     public void removeFavorite(User user, Long gameId) {
         Optional<Favorite> existing = favoriteRepository.findByUserIdAndGameId(user.getId(), gameId);
         if (existing.isPresent()) {
@@ -36,6 +44,9 @@ public class FavoriteService {
         return favoriteRepository.findByUserIdAndGameId(user.getId(), gameId).isPresent();
     }
 
+    /**
+     * Returns all favorites for a user so controllers can resolve the linked games.
+     */
     public List<Favorite> getUserFavorites(Long userId) {
         return favoriteRepository.findByUserId(userId);
     }

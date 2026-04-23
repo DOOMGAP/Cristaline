@@ -24,6 +24,10 @@ public class ImportService {
     }
 
     @Transactional
+    /**
+     * Synchronizes the local catalog with FreeToGame. Imported rows keep their
+     * external apiId while manually created games (apiId == null) are preserved.
+     */
     public int refreshFromFreeToGame() {
         List<FreeToGameApiResponse> apiGames = freeToGameClient.fetchGames();
         List<Game> importedGames = apiGames.stream()

@@ -15,15 +15,15 @@ import { Game } from '../../data/game.model';
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule],
   template: `
-    <a routerLink="/games" class="back">Retour au catalogue</a>
+    <a routerLink="/games" class="back" data-testid="game-back-link">Retour au catalogue</a>
 
-    <section *ngIf="game" class="detail">
+    <section *ngIf="game" class="detail" data-testid="game-detail">
       <div class="cover" [style.background-image]="'url(' + (game.coverUrl || '') + ')'"></div>
       <div class="content">
         <div class="header">
           <div>
             <p class="eyebrow">{{ game.genre }} • {{ game.releaseYear }}</p>
-            <h1>{{ game.title }}</h1>
+            <h1 data-testid="game-title">{{ game.title }}</h1>
           </div>
           <button 
             class="favorite-btn" 
@@ -31,6 +31,7 @@ import { Game } from '../../data/game.model';
             (click)="toggleFavorite()"
             [disabled]="isTogglingFavorite"
             [title]="isFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            data-testid="favorite-toggle"
           >
             <span class="star">★</span>
           </button>
@@ -57,6 +58,7 @@ import { Game } from '../../data/game.model';
                 max="10"
                 step="0.5"
                 class="rating-field"
+                data-testid="rating-input"
               />
             </div>
 
@@ -64,17 +66,18 @@ import { Game } from '../../data/game.model';
               type="submit"
               class="submit-btn"
               [disabled]="ratingForm.invalid || isSubmitting || !isRatingChanged"
+              data-testid="rating-submit"
             >
               {{ isSubmitting ? 'Envoi...' : (hasExistingRating ? 'Modifier la note' : 'Soumettre la note') }}
             </button>
 
-            <p *ngIf="ratingError" class="error">{{ ratingError }}</p>
+            <p *ngIf="ratingError" class="error" data-testid="rating-error">{{ ratingError }}</p>
           </form>
         </div>
       </div>
     </section>
 
-    <p *ngIf="error" class="error">{{ error }}</p>
+    <p *ngIf="error" class="error" data-testid="game-error">{{ error }}</p>
   `,
   styles: [`
     .back, .detail {

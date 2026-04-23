@@ -19,6 +19,9 @@ public class RatingService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Persists a new rating or updates the existing one for a user/game pair.
+     */
     public Rating saveRating(User user, Long gameId, Double rating) {
         Optional<Rating> existing = ratingRepository.findByUserIdAndGameId(user.getId(), gameId);
 
@@ -37,6 +40,9 @@ public class RatingService {
         return ratingRepository.findAverageByGameId(gameId);
     }
 
+    /**
+     * Returns the number of ratings attached to a game for the detail page summary.
+     */
     public Long getRatingsCount(Long gameId) {
         return ratingRepository.countByGameId(gameId);
     }

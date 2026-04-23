@@ -25,8 +25,8 @@ services:
     volumes:
       - kafka-0-data:/var/lib/kafka/data
     ports:
-      - "9092:9092"
-      - "19092:19092"
+      - "${KAFKA_PORT:-9092}:9092"
+      - "${KAFKA_EXTERNAL_PORT:-19092}:19092"
     networks:
       - back
     healthcheck:
@@ -47,7 +47,7 @@ services:
       KAFKA_BROKERS: "kafka-0:9092"
       SERVER_LISTENPORT: 8080
     ports:
-      - "8081:8080"
+      - "${KAFKA_CONSOLE_PORT:-8081}:8080"
     networks:
       - back
 
@@ -78,7 +78,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
-      - "81:80"
+      - "${PGADMIN_PORT:-81}:80"
     depends_on:
       - consumer-postgresql
     networks:
@@ -95,6 +95,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      APP_SEED_ENABLED: ${APP_SEED_ENABLED:-true}
     depends_on:
       kafka-0:
         condition: service_healthy

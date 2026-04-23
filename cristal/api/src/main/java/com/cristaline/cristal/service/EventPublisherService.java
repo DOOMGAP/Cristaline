@@ -16,6 +16,10 @@ public class EventPublisherService {
         this.gameEventProducer = gameEventProducer;
     }
 
+    /**
+     * Publishes an asynchronous import request. In prod the Kafka consumer
+     * executes the actual refresh to decouple the admin API from the import.
+     */
     public void publishImportRequest(String requestedBy) {
         gameEventProducer.sendImportRequest(new ImportRequestEvent(
             "admin-import",
@@ -36,6 +40,9 @@ public class EventPublisherService {
         publishGameEvent("GAME_DELETED", game);
     }
 
+    /**
+     * Emits game lifecycle events for downstream consumers.
+     */
     private void publishGameEvent(String type, GameResponse game) {
         gameEventProducer.sendGameEvent(new GameEvent(
             type,
