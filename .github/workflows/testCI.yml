@@ -1,4 +1,4 @@
-name: CI/CD Cristal Fullstack
+name: CI - Tests
 
 on:
   push:
