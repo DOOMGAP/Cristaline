@@ -20,6 +20,7 @@ docker compose up --build
 
 Dans Docker, l'API démarre automatiquement avec le profil `prod`.
 Les variables sensibles et les ports sont lus depuis `.env`.
+L'import initial FreeToGame au démarrage peut être désactivé avec `APP_SEED_ENABLED=false`, utile pour les tests e2e reproductibles.
 
 ### Arrêt et redémarrage propre
 
@@ -85,3 +86,36 @@ docker load < cristaline-api.tar
 docker run -p 8080:8080 cristaline-api:latest
 ```
 Pour l'api, meme chose pour le front en remplacant api par front.
+
+## Tests
+
+### Backend
+
+```bash
+cd api
+mvn test
+```
+
+### Frontend unitaire
+
+```bash
+cd front
+npm ci --legacy-peer-deps
+npm run test -- --watch=false --browsers=ChromeHeadless
+```
+
+### E2E Playwright sur la stack Docker
+
+```bash
+cd /home/nadir95400/fullstack/cristal
+./scripts/run-e2e.sh
+```
+
+Le script:
+- démarre Docker Compose avec `APP_SEED_ENABLED=false`
+- attend que le front et l'API répondent
+- exécute les scénarios Playwright contre la vraie stack
+
+## Documentation technique
+
+Une vue d'ensemble de l'architecture, des profils et de la stratégie de test est disponible dans [../docs/architecture-technique.md](../docs/architecture-technique.md).

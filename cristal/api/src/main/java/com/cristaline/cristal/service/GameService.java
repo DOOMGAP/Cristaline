@@ -22,6 +22,9 @@ public class GameService {
         this.eventPublisherService = eventPublisherService;
     }
 
+    /**
+     * Lists games with optional title/genre/year filters.
+     */
     public List<GameResponse> listGames(String title, String genre, Integer year) {
         Specification<Game> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -54,6 +57,9 @@ public class GameService {
         return toResponse(findGame(id));
     }
 
+    /**
+     * Creates a manually managed game and emits a creation event.
+     */
     public GameResponse createGame(GameRequest request) {
         Game game = new Game();
         applyRequest(game, request);
@@ -70,6 +76,9 @@ public class GameService {
         return response;
     }
 
+    /**
+     * Deletes a game after snapshotting the payload required by event consumers.
+     */
     public void deleteGame(Long id) {
         Game game = findGame(id);
         GameResponse response = toResponse(game);
@@ -82,6 +91,10 @@ public class GameService {
             .orElseThrow(() -> new GameNotFoundException(id));
     }
 
+    /**
+     * Applies API request fields to the entity. apiId is intentionally untouched so
+     * imported games remain linked to the source dataset.
+     */
     private void applyRequest(Game game, GameRequest request) {
         game.setTitle(request.title());
         game.setGenre(request.genre());
