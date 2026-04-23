@@ -12,7 +12,6 @@ import { Game } from '../../data/game.model';
   template: `
     <section class="hero">
       <div>
-        <p class="eyebrow">Sprint 1</p>
         <h1>Catalogue des jeux</h1>
         <p class="lead">Recherche, filtrage et navigation vers les details du catalogue.</p>
       </div>
