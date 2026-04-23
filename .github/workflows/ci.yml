@@ -39,7 +39,7 @@ jobs:
       # 5. Install dépendances frontend
       - name: Install frontend dependencies
         working-directory: cristal/front
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       # 6. Build frontend Angular
       - name: Build frontend
