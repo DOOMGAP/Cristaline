@@ -1,4 +1,4 @@
-name: CI - Cristal (Basic Check)
+name: CI - Security
 
 on:
   push:
