@@ -106,6 +106,13 @@ npm run test -- --watch=false --browsers=ChromeHeadless
 
 ### E2E Playwright sur la stack Docker
 
+Avant le premier lancement, installer les navigateurs Playwright :
+
+```bash
+cd front
+npm run e2e:install
+```
+
 ```bash
 cd /home/nadir95400/fullstack/cristal
 ./scripts/run-e2e.sh
